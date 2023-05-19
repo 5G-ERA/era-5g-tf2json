@@ -2,7 +2,8 @@ import copy
 from typing import Dict
 
 import numpy as np
-from geometry_msgs.msg import Transform, TransformStamped
+from geometry_msgs.msg import Transform  # pants: no-infer-dep
+from geometry_msgs.msg import TransformStamped  # pants: no-infer-dep
 from pyquaternion import Quaternion
 
 
