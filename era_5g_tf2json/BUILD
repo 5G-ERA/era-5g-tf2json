@@ -1,14 +1,4 @@
-python_sources(
-    name="lib",
-    skip_mypy=True,
-    skip_black=True,
-    skip_flake8=True,
-)
-
-# this is to force flake8/mypy to test with different versions of Python
-python_sources(name="lib_py38", interpreter_constraints=["==3.8.*"])
-python_sources(name="lib_py39", interpreter_constraints=["==3.9.*"])
-python_sources(name="lib_py310", interpreter_constraints=["==3.10.*"])
+python_sources(name="lib")
 
 resources(name="py.typed", sources=["py.typed"])
 
@@ -24,7 +14,7 @@ python_distribution(
         author="Zdenek Materna",
         author_email="imaterna@fit.vut.cz",
         license="LGPL",
-        python_requires=">=3.8,<3.11",
+        python_requires="==3.8.*",
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",

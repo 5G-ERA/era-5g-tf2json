@@ -18,17 +18,9 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.8']
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
-    - name: Setup Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
     - uses: ros-tooling/setup-ros@v0.6
       with:
         required-ros-distributions: foxy
@@ -44,6 +36,9 @@ jobs:
     - name: Lint and typecheck
       run: | 
         ./pants lint check ::
+    - name: Test
+      run: |
+        ./pants test ::
     - name: Build and install packages
       run: |
         # We also smoke test that our release process will work by running `package`.

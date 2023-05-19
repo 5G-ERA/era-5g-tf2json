@@ -70,4 +70,5 @@ class TFRepublisher:
                 pair.transmission_triggered()
                 transforms.append(transform_msg)
 
-        self._callback(transforms)
+        if transforms:
+            self._callback(transforms)
