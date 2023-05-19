@@ -1,6 +1,8 @@
-import rclpy
-from geometry_msgs.msg import TransformStamped
-from rclpy.node import Node
+from typing import List
+
+import rclpy  # pants: no-infer-dep
+from geometry_msgs.msg import TransformStamped  # pants: no-infer-dep
+from rclpy.node import Node  # pants: no-infer-dep
 
 from era_5g_tf2json.tf2_web_republisher import TFRepublisher
 
@@ -10,7 +12,7 @@ class ExampleNode(Node):
         super(ExampleNode, self).__init__("tf2_web_republisher_example_node")
         self.republisher = TFRepublisher(self, self.callback, 1.0)
 
-    def callback(self, transforms: TransformStamped) -> None:
+    def callback(self, transforms: List[TransformStamped]) -> None:
         self.get_logger().info(f"Got {len(transforms)}")
 
 

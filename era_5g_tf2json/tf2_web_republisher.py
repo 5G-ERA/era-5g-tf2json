@@ -1,9 +1,10 @@
 from typing import Callable, List
 
-import rclpy
-from geometry_msgs.msg import TransformStamped
-from rclpy.node import Node
-from tf2_ros import Buffer, TransformException, TransformListener
+import rclpy  # pants: no-infer-dep
+from geometry_msgs.msg import TransformStamped  # pants: no-infer-dep
+from rclpy.node import Node  # pants: no-infer-dep
+from tf2_ros import TransformListener  # pants: no-infer-dep
+from tf2_ros import Buffer, TransformException  # pants: no-infer-dep
 
 from era_5g_tf2json.tf_pair import TFPair
 
