@@ -9,7 +9,7 @@ python_distribution(
     sdist=True,
     provides=setup_py(
         name="era_5g_tf2json",
-        version="0.1.0",
+        version="0.2.0",
         description="Library to convert ROS2 TF into a JSON.",
         author="Zdenek Materna",
         author_email="imaterna@fit.vut.cz",

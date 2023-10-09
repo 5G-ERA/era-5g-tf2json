@@ -1,24 +1,29 @@
 import copy
-from typing import Dict
+from typing import Dict, Optional
 
 import numpy as np
+import rclpy  # pants: no-infer-dep
 from geometry_msgs.msg import Transform  # pants: no-infer-dep
 from geometry_msgs.msg import TransformStamped  # pants: no-infer-dep
 from pyquaternion import Quaternion
 
 
 class TFPair:
-    def __init__(self, source_frame: str, target_frame: str, angular_thres=0.0, trans_thres=0.0) -> None:
+    def __init__(
+        self, source_frame: str, target_frame: str, angular_thres=0.0, trans_thres=0.0, max_publish_period=1.0
+    ) -> None:
         self.is_ok = True
         self._source_frame = source_frame
         self._target_frame = target_frame
         self._angular_thres = angular_thres
         self._trans_thres = trans_thres
+        self._max_publish_period = max_publish_period
 
         self._tf_transmitted = {"translation": np.array([0.0, 0.0, 0.0]), "rotation": Quaternion(1.0, 0.0, 0.0, 0.0)}
         self._tf_received = {"translation": np.array([0.0, 0.0, 0.0]), "rotation": Quaternion(1.0, 0.0, 0.0, 0.0)}
 
         self._last_tf_msg = Transform()
+        self._last_publish_time: Optional[rclpy.time.Time] = None
 
         self.first_transmission = True
         self._updated = False
@@ -69,8 +74,9 @@ class TFPair:
     def last_tf_msg(self) -> Transform:
         return self._last_tf_msg
 
-    def transmission_triggered(self) -> None:
+    def transmission_triggered(self, current_time: rclpy.time.Time) -> None:
         self._tf_transmitted = copy.deepcopy(self._tf_received)
+        self._last_publish_time = current_time
 
     def update_transform(self, update: TransformStamped) -> None:
         self._tf_received["translation"] = np.array(
@@ -85,17 +91,19 @@ class TFPair:
         self._last_tf_msg = update.transform
         self._updated = True
 
-    @property
-    def update_needed(self) -> bool:
+    def update_needed(self, current_time: rclpy.time.Time) -> bool:
         result = False
         if self._updated:
-            if self._trans_thres == 0.0 or self._angular_thres == 0.0:
+            if self._trans_thres and (self.distance(self._tf_transmitted, self._tf_received) > self._trans_thres):
                 result = True
                 self.first_transmission = False
-            elif self.distance(self._tf_transmitted, self._tf_received) > self._trans_thres:
+            elif self._angular_thres and (self.angle(self._tf_transmitted, self._tf_received) > self._angular_thres):
                 result = True
                 self.first_transmission = False
-            elif self.angle(self._tf_transmitted, self._tf_received) > self._angular_thres:
+            elif self._max_publish_period and (
+                self._last_publish_time is None
+                or (current_time - self._last_publish_time > rclpy.duration.Duration(seconds=self._max_publish_period))
+            ):
                 result = True
                 self.first_transmission = False
             elif self.first_transmission:
