@@ -20,11 +20,22 @@ class TFRepublisher:
         self._callback = callback
 
     def subscribe_transform(
-        self, source_frame: str, target_frame: str, angular_thres: float, trans_thres: float
+        self,
+        source_frame: str,
+        target_frame: str,
+        angular_thres: float,
+        trans_thres: float,
+        max_publish_period: float = 0.0,
     ) -> None:
 
         self._tf_pairs.append(
-            TFPair(self._clean_tf_frame(source_frame), self._clean_tf_frame(target_frame), angular_thres, trans_thres)
+            TFPair(
+                self._clean_tf_frame(source_frame),
+                self._clean_tf_frame(target_frame),
+                angular_thres,
+                trans_thres,
+                max_publish_period,
+            )
         )
 
     @staticmethod
@@ -37,7 +48,7 @@ class TFRepublisher:
 
         transforms: TransformStamped = []
 
-        current_time_msg = self._node.get_clock().now().to_msg()
+        current_time = self._node.get_clock().now()
 
         # iterate over tf_subscription vector
         for pair in self._tf_pairs:
@@ -61,13 +72,13 @@ class TFRepublisher:
                 pair.is_ok = False
 
             # check angular and translational thresholds
-            if pair.update_needed:
+            if pair.update_needed(current_time):
                 transform_msg = TransformStamped()
-                transform_msg.header.stamp = current_time_msg
+                transform_msg.header.stamp = current_time.to_msg()
                 transform_msg.header.frame_id = pair.target_frame
                 transform_msg.child_frame_id = pair.source_frame
                 transform_msg.transform = pair.last_tf_msg
-                pair.transmission_triggered()
+                pair.transmission_triggered(current_time)
                 transforms.append(transform_msg)
 
         if transforms:
