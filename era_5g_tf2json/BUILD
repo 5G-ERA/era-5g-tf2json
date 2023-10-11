@@ -9,12 +9,12 @@ python_distribution(
     sdist=True,
     provides=setup_py(
         name="era_5g_tf2json",
-        version="0.2.0",
+        version="0.2.1",
         description="Library to convert ROS2 TF into a JSON.",
         author="Zdenek Materna",
         author_email="imaterna@fit.vut.cz",
         license="LGPL",
-        python_requires="==3.8.*",
+        python_requires=">=3.8",
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
